@@ -12,7 +12,7 @@ namespace PolishNotation
 
         public string PostFix { get; private set; }
 
-        
+        public double Result { get; private set; }
 
         private static Dictionary<char, int> Priority = new Dictionary<char, int>
         {
@@ -89,5 +89,92 @@ namespace PolishNotation
 
             return res;
         }
+
+        public static string getFuncFromStr(string str, ref int index)
+        {
+            var res = "";
+
+            while (index < str.Length)
+            {
+                var c = str[index];
+
+                if (Char.IsLetter(c))
+                    res += c;
+                else
+                {
+                    index--;
+                    break;
+                }
+
+                index++;
+            }
+
+            return res;
+        }
+
+        private static double ExecuteOperator(double a, double b, char op)
+        {
+            double res = 0;
+            switch (op)
+            {
+                case '+': return a + b;
+                case '-': return a - b;
+                case '*': return a * b;
+                case '/':
+                    if (b == 0) throw new DivideByZeroException();
+                    return a / b;
+                case '^': return Math.Pow(a,b);
+                default: return 0;
+            }
+        }
+
+        public double Make()
+        {
+            var stack = new Stack<double>();
+            int counter = 0;
+            for(int i=0; i< PostFix.Length; i++)
+            {
+                if (Char.IsDigit(PostFix[i]))
+                    stack.Push(Convert.ToDouble(getNumberFromStr(PostFix, ref i)));
+                else if(Priority.ContainsKey(PostFix[i]))
+                {
+                    counter++;
+
+                    if(PostFix[i] =='~')
+                    {
+                        var last = stack.Count>0 ? stack.Pop() : 0;
+                        stack.Push(ExecuteOperator(0, last, '-'));
+                        continue;
+                    }
+
+
+
+                    var second = stack.Count > 0 ? stack.Pop() : 0;
+                    var first = stack.Count > 0 ? stack.Pop() : 0;
+
+
+                    stack.Push(ExecuteOperator(first, second, PostFix[i]));
+                }
+
+            }
+
+            return stack.Pop();
+        }
+
+
+
+
+
+        /*
+         Проходим постфиксную запись;
+
+При нахождении числа, парсим его и заносим в стек;
+
+При нахождении бинарного оператора, берём два последних значения из стека в обратном порядке;
+
+При нахождении унарного оператора, в данном случае - унарного минуса, берём последнее значение из стека и вычитаем его из нуля, 
+        так как унарный минус является правосторонним оператором;
+
+Последнее значение, после отработки алгоритма, является решением выражения.*/
     }
 }
