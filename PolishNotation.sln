@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolishNotation", "PolishNotation\PolishNotation.csproj", "{2429FBEB-E880-451C-AA4C-B85275CBF6DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PolishNotationTests", "PolishNotationTests\PolishNotationTests.csproj", "{747CCD0E-0E89-4FC3-941E-D452EE24E6C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2429FBEB-E880-451C-AA4C-B85275CBF6DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2429FBEB-E880-451C-AA4C-B85275CBF6DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2429FBEB-E880-451C-AA4C-B85275CBF6DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747CCD0E-0E89-4FC3-941E-D452EE24E6C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747CCD0E-0E89-4FC3-941E-D452EE24E6C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747CCD0E-0E89-4FC3-941E-D452EE24E6C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747CCD0E-0E89-4FC3-941E-D452EE24E6C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
