@@ -13,8 +13,9 @@ namespace PolishNotation
         public List<string> PostFix { get; private set; }
         public double Result { get; private set; }
 
-        public Dictionary<int, Tuple<string, string>> SolutionHistory { get; private set; }
+        //public Dictionary<int, Tuple<string, string>> SolutionHistory { get; private set; }
 
+        public List<HistoryNote> SolutionHistory { get; private set; }
 
         private static Dictionary<string, int> Priority = new Dictionary<string, int>
         {
@@ -37,7 +38,7 @@ namespace PolishNotation
         };
         public Expression(string infFixExpr)
         {
-            SolutionHistory = new Dictionary<int, Tuple<string,string>>();
+            SolutionHistory = new List<HistoryNote>();
             InFix = infFixExpr;
             PostFix = InFixToPostFix(InFix);
         }
@@ -165,6 +166,7 @@ namespace PolishNotation
             int step = 0;
             for (int i = 0; i < PostFix.Count; i++)
             {
+                step++;
                 if (isSaving) MakeHistoryNote(step, i, stack);
                 if (Char.IsDigit(PostFix[i][0]))
                     stack.Push(Convert.ToDouble(PostFix[i]));
@@ -203,8 +205,30 @@ namespace PolishNotation
         {
             var leftStr = PostFix.Skip(index).ToList();
             var stackStr = string.Join(", ", currentStack);
-            SolutionHistory[index] = Tuple.Create(string.Join(", ", leftStr),stackStr);
+
+            SolutionHistory.Add(new HistoryNote(step, string.Join(", ", leftStr), stackStr));
         }
 
+
+
+
     }
+
+
+
+
+    public class HistoryNote
+    {
+        public int Step { get; private set; }
+        public string StringLeft { get; private set; }
+        public string CurrentStack { get; private set; }
+
+        public HistoryNote(int s, string str, string stackLeft)
+        {
+            Step = s;
+            StringLeft = str;
+            CurrentStack = stackLeft;
+        }
+    }
+        
 }
