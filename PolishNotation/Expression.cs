@@ -13,11 +13,9 @@ namespace PolishNotation
         public List<string> PostFix { get; private set; }
         public double Result { get; private set; }
 
-        //public Dictionary<int, Tuple<string, string>> SolutionHistory { get; private set; }
-
         public List<HistoryNote> SolutionHistory { get; private set; }
 
-        private static Dictionary<string, int> Priority = new Dictionary<string, int>
+        public static Dictionary<string, int> Priority = new Dictionary<string, int>
         {
             { "(", 0 },
             { "+", 1 },
@@ -205,7 +203,7 @@ namespace PolishNotation
         {
             var leftStr = PostFix.Skip(index).ToList();
             var stackStr = string.Join(", ", currentStack);
-
+            
             SolutionHistory.Add(new HistoryNote(step, string.Join(", ", leftStr), stackStr));
         }
 
