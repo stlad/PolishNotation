@@ -11,9 +11,10 @@ namespace PolishNotation
         public string InFix { get; private set; }
 
         public List<string> PostFix { get; private set; }
-
-
         public double Result { get; private set; }
+
+        public Dictionary<int, Tuple<string, string>> SolutionHistory { get; private set; }
+
 
         private static Dictionary<string, int> Priority = new Dictionary<string, int>
         {
@@ -26,10 +27,17 @@ namespace PolishNotation
             { "~", 4 }, //унарный минус
             { "sin", 4 },
             { "cos", 4 },
-            { "sqrt",4 }
+            { "sqrt",4 },
+            //-----------
+            { "tg",4 },
+            {"abs",4 },
+            {"acos",4 },
+            {"asin",4 },
+            {"atan",4 }
         };
         public Expression(string infFixExpr)
         {
+            SolutionHistory = new Dictionary<int, Tuple<string,string>>();
             InFix = infFixExpr;
             PostFix = InFixToPostFix(InFix);
         }
@@ -38,7 +46,7 @@ namespace PolishNotation
         private static List<string> InFixToPostFix(string infExpr)
         {
             var res = new List<string>();
-            var stack = new Stack<string>();
+            var operatorStack = new Stack<string>();
             for(int i=0; i<infExpr.Length; i++)
             {
                 var currentChar = infExpr[i];
@@ -46,14 +54,14 @@ namespace PolishNotation
                 if (Char.IsDigit(currentChar))
                     res.Add(getNumberFromStr(infExpr, ref i));
                 else if (Char.IsLetter(currentChar))
-                    stack.Push(getFuncFromStr(infExpr, ref i));
+                    operatorStack.Push(getFuncFromStr(infExpr, ref i));
                 else if (currentChar == '(')
-                    stack.Push(Convert.ToString(currentChar));
+                    operatorStack.Push(Convert.ToString(currentChar));
                 else if (currentChar == ')')
                 {
-                    while (stack.Count > 0 && stack.Peek() != "(")
-                        res.Add(stack.Pop());
-                    stack.Pop();
+                    while (operatorStack.Count > 0 && operatorStack.Peek() != "(")
+                        res.Add(operatorStack.Pop());
+                    operatorStack.Pop();
                 }
                 else if (Priority.ContainsKey(Convert.ToString( currentChar)))
                 {
@@ -62,14 +70,14 @@ namespace PolishNotation
                         op = "~";
 
 
-                    while (stack.Count > 0 && (Priority[stack.Peek()] >= Priority[op]))
-                        res.Add(stack.Pop());
+                    while (operatorStack.Count > 0 && (Priority[operatorStack.Peek()] >= Priority[op]))
+                        res.Add(operatorStack.Pop());
 
-                    stack.Push(op);
+                    operatorStack.Push(op);
                 }
             }
 
-            foreach (var op in stack)
+            foreach (var op in operatorStack)
                 res.Add(op);
             return res;
         }
@@ -136,16 +144,28 @@ namespace PolishNotation
                     return Math.Cos(a);
                 case "sqrt":
                     return Math.Sqrt(a);
+                case "tg":
+                    return Math.Tan(a);
+                case "abs":
+                    return Math.Abs(a);
+                case "acos":
+                    return Math.Acos(a);
+                case "asin":
+                    return Math.Asin(a);
+                case "atan":
+                    return Math.Atan(a);
                 default: return 0;
             }
         }
 
-        public double Make()
+        public double Calculate(bool isSaving)
         {
             var stack = new Stack<double>();
             int counter = 0;
+            int step = 0;
             for (int i = 0; i < PostFix.Count; i++)
             {
+                if (isSaving) MakeHistoryNote(step, i, stack);
                 if (Char.IsDigit(PostFix[i][0]))
                     stack.Push(Convert.ToDouble(PostFix[i]));
                 else if(Priority.ContainsKey(PostFix[i]))
@@ -158,27 +178,12 @@ namespace PolishNotation
                         continue;
                     }
 
-                    if(PostFix[i] == "sin")
+                    if(Char.IsLetter(PostFix[i][0]))
                     {
                         var last = stack.Count > 0 ? stack.Pop() : 0;
-                        stack.Push(ExecuteOperator(last, 0, "sin"));
+                        stack.Push(ExecuteOperator(last, 0, PostFix[i]));
                         continue;
                     }
-
-                    if (PostFix[i] == "cos")
-                    {
-                        var last = stack.Count > 0 ? stack.Pop() : 0;
-                        stack.Push(ExecuteOperator(last, 0, "cos"));
-                        continue;
-                    }
-
-                    if (PostFix[i] == "sqrt")
-                    {
-                        var last = stack.Count > 0 ? stack.Pop() : 0;
-                        stack.Push(ExecuteOperator(last, 0, "sqrt"));
-                        continue;
-                    }
-
                     var second = stack.Count > 0 ? stack.Pop() : 0;
                     var first = stack.Count > 0 ? stack.Pop() : 0;
 
@@ -186,25 +191,20 @@ namespace PolishNotation
                 }
             }
 
-
+            step++;
+            Result = stack.Peek();
             return stack.Pop();
             
         }
 
+        public string GetPostFixExpression() => string.Join(" ", this.PostFix);
 
+        private void MakeHistoryNote(int step, int index, Stack<double> currentStack)
+        {
+            var leftStr = PostFix.Skip(index).ToList();
+            var stackStr = string.Join(", ", currentStack);
+            SolutionHistory[index] = Tuple.Create(string.Join(", ", leftStr),stackStr);
+        }
 
-
-
-        /*
-         Проходим постфиксную запись;
-
-При нахождении числа, парсим его и заносим в стек;
-
-При нахождении бинарного оператора, берём два последних значения из стека в обратном порядке;
-
-При нахождении унарного оператора, в данном случае - унарного минуса, берём последнее значение из стека и вычитаем его из нуля, 
-        так как унарный минус является правосторонним оператором;
-
-Последнее значение, после отработки алгоритма, является решением выражения.*/
     }
 }
